@@ -1,0 +1,22 @@
+# Web API
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic>=2.9.0
+pydantic-settings>=2.6.0
+
+# Async task queue
+celery[redis]>=5.4.0
+redis>=5.2.0
+
+# Media ingestion
+yt-dlp>=2024.12.0
+
+# Speech-to-text (local, CPU-efficient)
+faster-whisper>=1.1.0
+
+# HTTP client (future LLM integrations)
+httpx>=0.28.0
+
+# Dev / test
+pytest>=8.3.0
+pytest-asyncio>=0.24.0
