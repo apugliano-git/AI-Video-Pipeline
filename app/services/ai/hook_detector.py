@@ -16,12 +16,12 @@ GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
 SYSTEM_PROMPT = """You are an expert viral short-form content strategist.
-Analyze the timestamped transcript and select the single most engaging 30-60 second segment
-that would work as a vertical clip (TikTok/Reels/Shorts).
+Analyze the timestamped transcript and select the single most engaging 30-75 second segment
+(preferably 60-75 seconds for optimal monetization) that would work as a vertical clip (TikTok/Reels/Shorts).
 
 Prioritize segments with:
 - Strong emotional hooks or surprising statements
-- Clear narrative payoff within 30-60 seconds
+- Clear narrative payoff within 30-75 seconds
 - High energy, humor, controversy, or actionable insight
 - Self-contained context (understandable without prior setup)
 
@@ -35,7 +35,7 @@ Respond ONLY with valid JSON matching this exact schema:
 }
 
 Rules:
-- end_seconds - start_seconds MUST be between 30 and 60 seconds
+- end_seconds - start_seconds MUST be between 30 and 75 seconds
 - Times must align with the transcript segment timestamps provided
 - Do not invent content outside the transcript
 """

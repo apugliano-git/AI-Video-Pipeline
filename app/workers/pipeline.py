@@ -6,6 +6,7 @@ from celery.result import AsyncResult
 from app.workers.tasks.ingest import ingest_media_task
 from app.workers.tasks.transcribe import transcribe_audio_task
 from app.workers.tasks.analyze import analyze_hook_task
+from app.workers.tasks.render import render_clip_task
 
 
 def enqueue_ingest_and_transcribe(job_id: str, source_url: str) -> AsyncResult:
@@ -20,5 +21,6 @@ def enqueue_ingest_and_transcribe(job_id: str, source_url: str) -> AsyncResult:
         ingest_media_task.s(job_id, source_url),
         transcribe_audio_task.s(),
         analyze_hook_task.s(),
+        render_clip_task.s(),
     )
     return workflow.apply_async()

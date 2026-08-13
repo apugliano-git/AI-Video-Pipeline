@@ -22,6 +22,8 @@ class JobResponse(BaseModel):
     audio_path: str | None = None
     transcript_path: str | None = None
     analysis_path: str | None = None
+    final_clip_path: str | None = None
+    clip_url: str | None = None
     error: str | None = None
     created_at: datetime
     updated_at: datetime

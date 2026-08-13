@@ -3,7 +3,7 @@
 from pydantic import BaseModel, Field, model_validator
 
 MIN_HOOK_DURATION = 30.0
-MAX_HOOK_DURATION = 60.0
+MAX_HOOK_DURATION = 75.0
 
 
 class HookAnalysisResult(BaseModel):

@@ -10,7 +10,12 @@ celery_app = Celery(
     "clipper",
     broker=settings.celery_broker_url,
     backend=settings.celery_result_backend,
-    include=["app.workers.tasks.ingest", "app.workers.tasks.transcribe"],
+    include=[
+        "app.workers.tasks.ingest",
+        "app.workers.tasks.transcribe",
+        "app.workers.tasks.analyze",
+        "app.workers.tasks.render",
+    ],
 )
 
 celery_app.conf.update(

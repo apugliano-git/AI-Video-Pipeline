@@ -57,6 +57,8 @@ class JobRepository:
         audio_path: str | None = None,
         transcript_path: str | None = None,
         analysis_path: str | None = None,
+        final_clip_path: str | None = None,
+        clip_url: str | None = None,
         error: str | None = None,
     ) -> JobResponse:
         job = self.get(job_id)
@@ -76,6 +78,12 @@ class JobRepository:
             payload["audio_path"] = audio_path
         if transcript_path is not None:
             payload["transcript_path"] = transcript_path
+        if analysis_path is not None:
+            payload["analysis_path"] = analysis_path
+        if final_clip_path is not None:
+            payload["final_clip_path"] = final_clip_path
+        if clip_url is not None:
+            payload["clip_url"] = clip_url
         if error is not None:
             payload["error"] = error
 

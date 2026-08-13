@@ -48,6 +48,7 @@ class Settings(BaseSettings):
     
     supabase_url: str = ""
     supabase_key: str = ""
+    supabase_bucket: str = "clips"
 
     def ensure_storage_dirs(self) -> None:
         self.storage_root.mkdir(parents=True, exist_ok=True)
