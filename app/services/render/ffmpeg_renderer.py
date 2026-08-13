@@ -21,22 +21,39 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
+from functools import lru_cache
+
 logger = logging.getLogger(__name__)
 
 # ── Output video settings ─────────────────────────────────────────────────────
 OUTPUT_WIDTH = 1080
 OUTPUT_HEIGHT = 1920
 
-# Video codec: libx264 produces universally compatible H.264 MP4.
-VIDEO_CODEC = "libx264"
-# Constant Rate Factor: 18 = near-lossless; 23 = default; lower = higher quality.
 CRF = 20
-# Encoding preset: controls speed vs compression efficiency.
-# "fast" is a good balance for a worker process running on CPU.
-PRESET = "fast"
-# Audio codec: AAC is the standard for MP4 / mobile platforms.
 AUDIO_CODEC = "aac"
 AUDIO_BITRATE = "192k"
+
+
+@lru_cache
+def _get_available_video_encoder() -> tuple[str, list[str]]:
+    """
+    Detects the best available H.264 encoder in FFmpeg.
+    Returns (encoder_name, extra_encoder_flags).
+    """
+    try:
+        res = subprocess.run(["ffmpeg", "-encoders"], capture_output=True, text=True)
+        out = res.stdout
+        if "libx264" in out:
+            return "libx264", ["-crf", str(CRF), "-preset", "fast"]
+        if "libopenh264" in out:
+            return "libopenh264", []
+        if "h264_nvenc" in out:
+            return "h264_nvenc", ["-preset", "p4"]
+        if "h264_vaapi" in out:
+            return "h264_vaapi", []
+    except Exception:
+        pass
+    return "libx264", ["-crf", str(CRF), "-preset", "fast"]
 
 
 @dataclass(frozen=True)
@@ -104,6 +121,8 @@ def render_clip(
         f"[scaled]ass='{ass_path}'[out]"
     )
 
+    encoder, encoder_flags = _get_available_video_encoder()
+
     cmd = [
         "ffmpeg",
         "-y",                           # overwrite output without asking
@@ -113,9 +132,8 @@ def render_clip(
         "-filter_complex", filter_complex,
         "-map", "[out]",                # use the processed video stream
         "-map", "0:a",                  # use the original audio stream
-        "-c:v", VIDEO_CODEC,
-        "-crf", str(CRF),
-        "-preset", PRESET,
+        "-c:v", encoder,
+        *encoder_flags,
         "-c:a", AUDIO_CODEC,
         "-b:a", AUDIO_BITRATE,
         "-movflags", "+faststart",      # move MP4 metadata to front for streaming

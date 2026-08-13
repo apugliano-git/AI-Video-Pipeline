@@ -23,6 +23,12 @@ htmlcov/
 # Media storage (local dev)
 storage/downloads/*
 storage/temp/*
+app/storage/
+*.mp4
+*.wav
+*.mp3
+*.ass
+*.m4a
 !storage/downloads/.gitkeep
 !storage/temp/.gitkeep
 

@@ -27,16 +27,17 @@ Prioritize segments with:
 
 Respond ONLY with valid JSON matching this exact schema:
 {
-  "start_seconds": <float>,
-  "end_seconds": <float>,
+  "start_seconds": <float in seconds, e.g. 145.2>,
+  "end_seconds": <float in seconds, e.g. 210.5>,
   "hook_title": "<short catchy title, max 120 chars>",
   "reasoning": "<technical justification for virality>",
   "confidence_score": <float 0.0-1.0>
 }
 
 Rules:
-- end_seconds - start_seconds MUST be between 30 and 75 seconds
-- Times must align with the transcript segment timestamps provided
+- (end_seconds - start_seconds) MUST be between 30 and 75 seconds
+- start_seconds and end_seconds MUST be positive float seconds (e.g. 120.5) taken directly from the bracketed seconds in the transcript
+- end_seconds MUST NOT exceed the total video duration
 - Do not invent content outside the transcript
 """
 
@@ -52,16 +53,16 @@ def format_timestamp(seconds: float) -> str:
 
 def format_transcript_for_prompt(transcript: TranscriptResult) -> str:
     lines = [
-        f"Video duration: {transcript.duration_seconds:.1f}s",
+        f"Total Video duration: {transcript.duration_seconds:.1f} seconds ({format_timestamp(transcript.duration_seconds)})",
         f"Language: {transcript.language}",
         f"Word count: {transcript.word_count}",
         "",
-        "Timestamped transcript:",
+        "Timestamped transcript (seconds are in brackets):",
     ]
     for segment in transcript.segments:
-        start = format_timestamp(segment.start)
-        end = format_timestamp(segment.end)
-        lines.append(f"[{start} - {end}] {segment.text.strip()}")
+        start_fmt = format_timestamp(segment.start)
+        end_fmt = format_timestamp(segment.end)
+        lines.append(f"[{segment.start:.1f}s ({start_fmt}) - {segment.end:.1f}s ({end_fmt})] {segment.text.strip()}")
     return "\n".join(lines)
 
 
