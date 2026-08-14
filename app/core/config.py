@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     app_name: str = "AI Video Clipper"
     app_env: str = "development"
-    debug: bool = True
+    debug: bool = False
     api_v1_prefix: str = "/api/v1"
 
     host: str = "0.0.0.0"
@@ -40,11 +40,11 @@ class Settings(BaseSettings):
     whisper_compute_type: str = "int8"
     whisper_language: str | None = None
 
-    llm_provider: str = "groq"
+    llm_provider: str = "groq"            # "groq" or "gemini"
     groq_api_key: str = ""
     groq_model: str = "llama-3.3-70b-versatile"
     google_ai_api_key: str = ""
-    gemini_model: str = "gemini-flash-latest"
+    gemini_model: str = "gemini-2.0-flash"  # Valid Gemini model ID
     
     supabase_url: str = ""
     supabase_key: str = ""

@@ -9,13 +9,15 @@ from app.workers.tasks.analyze import analyze_hook_task
 from app.workers.tasks.render import render_clip_task
 
 
-def enqueue_ingest_and_transcribe(job_id: str, source_url: str) -> AsyncResult:
+def enqueue_pipeline(job_id: str, source_url: str) -> AsyncResult:
     """
-    Run ingest → transcribe as an atomic Celery chain.
+    Enqueue the full 4-stage processing pipeline as a Celery chain.
 
-    Each task is independent and receives only the data it needs:
-      - ingest_media_task(job_id, source_url) → ingest payload
-      - transcribe_audio_task(ingest_payload) → enriched payload
+    Stages (each receives the previous task's return dict):
+      1. ingest_media_task   — yt-dlp download + audio extraction
+      2. transcribe_audio_task — faster-whisper STT with word timestamps
+      3. analyze_hook_task   — LLM viral hook detection
+      4. render_clip_task    — FFmpeg 9:16 render + subtitle burn-in
     """
     workflow = chain(
         ingest_media_task.s(job_id, source_url),

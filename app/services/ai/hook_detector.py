@@ -75,7 +75,6 @@ class HookDetector:
 
     def __init__(self, settings: Settings | None = None) -> None:
         self.settings = settings or get_settings()
-        self._client = httpx.Client(timeout=120.0)
 
     def detect(self, transcript: TranscriptResult) -> HookAnalysisResult:
         prompt = format_transcript_for_prompt(transcript)
@@ -127,12 +126,13 @@ class HookDetector:
         raise ValueError("No LLM API key configured (set GROQ_API_KEY or GOOGLE_AI_API_KEY)")
 
     def _call_llm(self, provider: str, prompt: str) -> str:
-        if provider == "groq":
-            return self._call_groq(prompt)
-        return self._call_gemini(prompt)
+        with httpx.Client(timeout=120.0) as client:
+            if provider == "groq":
+                return self._call_groq(client, prompt)
+            return self._call_gemini(client, prompt)
 
-    def _call_groq(self, prompt: str) -> str:
-        response = self._client.post(
+    def _call_groq(self, client: httpx.Client, prompt: str) -> str:
+        response = client.post(
             GROQ_API_URL,
             headers={
                 "Authorization": f"Bearer {self.settings.groq_api_key}",
@@ -152,9 +152,9 @@ class HookDetector:
         content = response.json()["choices"][0]["message"]["content"]
         return content
 
-    def _call_gemini(self, prompt: str) -> str:
+    def _call_gemini(self, client: httpx.Client, prompt: str) -> str:
         url = GEMINI_API_URL.format(model=self.settings.gemini_model)
-        response = self._client.post(
+        response = client.post(
             url,
             params={"key": self.settings.google_ai_api_key},
             json={

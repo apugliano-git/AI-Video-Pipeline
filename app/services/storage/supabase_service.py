@@ -71,11 +71,9 @@ class SupabaseStorageService:
 
         try:
             logger.info("Uploading %s to Supabase bucket '%s'...", file_name, bucket)
-            with file_path.open("rb") as f:
-                content = f.read()
-
-            with httpx.Client(timeout=60.0) as client:
-                response = client.post(upload_endpoint, headers=headers, content=content)
+            with httpx.Client(timeout=300.0) as client:
+                with file_path.open("rb") as f:
+                    response = client.post(upload_endpoint, headers=headers, content=f)
 
             if response.status_code in (200, 201):
                 logger.info("Successfully uploaded clip to Supabase: %s", public_url)

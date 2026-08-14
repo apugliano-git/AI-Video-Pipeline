@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.api.deps import get_job_repository
 from app.models.schemas import CreateJobRequest, JobResponse
 from app.services.job_store import JobRepository
-from app.workers.pipeline import enqueue_ingest_and_transcribe
+from app.workers.pipeline import enqueue_pipeline
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
@@ -23,7 +23,7 @@ def create_job(
     repo: JobRepository = Depends(get_job_repository),
 ) -> JobResponse:
     job = repo.create(source_url=str(payload.url))
-    enqueue_ingest_and_transcribe(str(job.id), str(payload.url))
+    enqueue_pipeline(str(job.id), str(payload.url))
     return job
 
 
