@@ -115,10 +115,18 @@ def render_clip(
 
     ass_path = str(subtitle_file).replace("\\", "/")
 
+    # Layout:
+    # 1. Background (bg): zoomed and blurred to fill the 1080x1920 canvas.
+    # 2. Foreground (fg): full 16:9 frame centered, preserving 100% of the video content.
+    # 3. Subtitles: burned on top of the combined video canvas.
+    # 4. Audio: resampled and synchronized with PTS-STARTPTS.
     filter_complex = (
-        f"[0:v]crop=ih*(9/16):ih:(iw-ih*(9/16))/2:0[cropped];"
-        f"[cropped]scale={OUTPUT_WIDTH}:{OUTPUT_HEIGHT}[scaled];"
-        f"[scaled]ass='{ass_path}'[out]"
+        f"[0:v]split=2[bg_in][fg_in];"
+        f"[bg_in]scale={OUTPUT_WIDTH}:{OUTPUT_HEIGHT}:force_original_aspect_ratio=increase,crop={OUTPUT_WIDTH}:{OUTPUT_HEIGHT},boxblur=20:5[bg];"
+        f"[fg_in]scale={OUTPUT_WIDTH}:-1[fg];"
+        f"[bg][fg]overlay=(W-w)/2:(H-h)/2[combined];"
+        f"[combined]ass='{ass_path}'[vout];"
+        f"[0:a]aresample=async=1,asetpts=PTS-STARTPTS[aout]"
     )
 
     encoder, encoder_flags = _get_available_video_encoder()
@@ -130,8 +138,8 @@ def render_clip(
         "-i", str(source_video),        # input file
         "-t", str(hook_duration),       # duration to encode (not end time)
         "-filter_complex", filter_complex,
-        "-map", "[out]",                # use the processed video stream
-        "-map", "0:a",                  # use the original audio stream
+        "-map", "[vout]",               # use the processed video stream
+        "-map", "[aout]",               # use the synchronized audio stream
         "-c:v", encoder,
         *encoder_flags,
         "-c:a", AUDIO_CODEC,

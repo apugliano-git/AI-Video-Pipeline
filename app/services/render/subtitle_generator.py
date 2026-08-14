@@ -25,19 +25,16 @@ logger = logging.getLogger(__name__)
 # The video canvas is 1080x1920 (9:16 vertical).
 
 FONT_NAME = "Arial"
-FONT_SIZE = 18          # points — relatively large for a 1080px-wide vertical video
-PRIMARY_COLOR = "&H00FFFFFF"   # white text (BGR hex, not RGB — .ass uses BGR)
-ACTIVE_COLOR = "&H0000F5FF"    # yellow highlight for the word being spoken (BGR)
-OUTLINE_COLOR = "&H00000000"   # black outline
-SHADOW_COLOR = "&H80000000"    # semi-transparent black shadow
-OUTLINE_WIDTH = 3
-SHADOW_DEPTH = 2
-# Vertical position: bottom third, safely above the platform UI buttons.
-# MarginV controls distance from the bottom edge in pixels.
-MARGIN_V = 220          # pixels from bottom — keeps text above IG/TikTok buttons
+FONT_SIZE = 75          # Large and bold for 1080x1920 vertical canvas
+PRIMARY_COLOR = "&H00FFFFFF"   # White text (&H00FFFFFF in ASS BGR)
+ACTIVE_COLOR = "&H0000F5FF"    # Bright yellow highlight for spoken word (&H0000F5FF in ASS BGR)
+OUTLINE_COLOR = "&H00000000"   # Black outline
+SHADOW_COLOR = "&H80000000"    # Semi-transparent drop shadow
+OUTLINE_WIDTH = 6
+SHADOW_DEPTH = 3
+MARGIN_V = 360          # Distance from bottom (comfortably above mobile UI buttons)
 
-# Words per subtitle "group" — how many words appear on screen at once.
-# 3 words feels natural and readable at glance speed for short-form video.
+# Words per subtitle group (3 words is optimal for quick readability)
 WORDS_PER_GROUP = 3
 
 
